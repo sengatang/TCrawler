@@ -31,6 +31,7 @@ urlpatterns = [
     # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^register/$', CrawlerUserRegisterView.as_view(), name='user_register'),
     url(r'^proxy/detail/$', ProxyDetailView.as_view(), name='proxy_detail'),
+    url(r'^proxy/detail/(?P<uuid>[A-Fa-f0-9-]+)/$', ProxyDelView.as_view(), name='del_proxy'),
     url(r'^proxy/list/$', ProxyView.as_view(), name='proxy_list'),
     url(r'^host/list/$', HostConfigView.as_view(), name='host_list'),
 

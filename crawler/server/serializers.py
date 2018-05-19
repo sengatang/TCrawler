@@ -21,7 +21,7 @@ class ProxySerializer(serializers.ModelSerializer):
         return obj.author.user.username
     class Meta:
         model = Proxy
-        fields = ('name', 'ip', 'created_at', 'is_active')
+        fields = ('uuid', 'name', 'ip', 'updated_at', 'is_active')
         lookup_field = 'uuid'
 
 

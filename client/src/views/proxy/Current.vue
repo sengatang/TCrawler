@@ -32,7 +32,7 @@
               width="50">
             </el-table-column>
             <el-table-column
-              prop="created_at"
+              prop="updated_at"
               label="日期"
               width="180">
             </el-table-column>
@@ -57,6 +57,28 @@
               </template>
             </el-table-column>
           </el-table>
+          <el-dialog
+            title="提示"
+            :visible.sync="dialogVisible"
+            width="30%"
+            :before-close="handleClose">
+            <div style="margin: 20px;"></div>
+            <el-form :label-position="top" label-width="80px" :model="IpDetail">
+              <el-form-item label="IP">
+                <el-input v-model="IpDetail.ip"></el-input>
+              </el-form-item>
+              <el-form-item label="状态">
+                <el-select v-model="IpDetail.is_active" placeholder="是否激活">
+                  <el-option label="1 激活" value=1></el-option>
+                  <el-option label="0 关闭" value=0></el-option>
+                </el-select>
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="dialogVisible = false">取 消</el-button>
+              <el-button type="primary" @click="updateIP(IpDetail)">确 定</el-button>
+            </span>
+          </el-dialog>
         </b-col>
       </b-row>
     </b-card>
@@ -67,7 +89,9 @@
   export default {
     data () {
       return {
+        dialogVisible: false,
         tableData: [],
+        IpDetail: [],
         dialogFormVisible: false,
         form: {
           name: '',
@@ -94,31 +118,71 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$message({
-            type: 'active',
-            message: '删除成功!'
-          })
-          console.log(index, row)
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
+          this.$http.delete('http://localhost:8000/proxy/detail/' + this.tableData[index].uuid + '/').then(response => {
+            this.$message({
+              type: 'active',
+              message: '删除成功!'
+            })
+            location.reload()
+          }, response => {
+            this.$message({
+              type: 'danger',
+              message: '删除失败!'
+            })
+            console.log(index, row)
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            })
           })
         })
       },
       newproxy () {
-        this.$prompt('请输入IP，多个IP请用逗号隔开', '新增代理', {
+        this.$prompt('请输入IP', '新增代理', {
           confirmButtonText: '确定',
           cancelButtonText: '取消'
         }).then(({ value }) => {
-          this.$message({
-            type: 'success',
-            message: '成功添加'
+          this.$http.post('http://localhost:8000/proxy/list/', {
+            ip: value
+          }).then(response => {
+            this.$message({
+              type: 'success',
+              message: '成功添加'
+            })
+            location.reload()
+          }, response => {
+            this.$message({
+              type: 'danger',
+              message: '添加失败'
+            })
           })
         }).catch(() => {
           this.$message({
             type: 'info',
             message: '取消输入'
+          })
+        })
+      },
+      handleEdit (index, row) {
+        this.dialogVisible = true
+        this.IpDetail = this.tableData[index]
+        console.log(this.IpDetail)
+        console.log(row)
+      },
+      updateIP (formdata) {
+        console.log(formdata)
+        this.$http.post('http://localhost:8000/proxy/detail/', {formdata}).then(response => {
+          this.$message({
+            type: 'success',
+            message: '更新成功'
+          })
+          this.dialogVisible = false
+          location.reload()
+        }, response => {
+          this.$message({
+            type: 'danger',
+            message: '更新失败'
           })
         })
       }

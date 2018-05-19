@@ -68,7 +68,6 @@ class ProxyDetailView(views.APIView):
 
 class ProxyView(generics.ListCreateAPIView):
     serializer_class = ProxySerializer
-    
     def get_queryset(self):
         try:
             tuser = TcrawlerUser.objects.get(user=self.request.user)
@@ -85,7 +84,31 @@ class ProxyView(generics.ListCreateAPIView):
         )
         response = serializer.data
         headers = self.get_success_headers(response)
-        return Response(response, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(response, status=status.HTTP_201_CREATED, headers=headers)   
+
+class ProxyDetailView(generics.RetrieveUpdateAPIView):
+    serializer_class = ProxySerializer
+    def get_queryset(self):
+        try:
+            tuser = TcrawlerUser.objects.get(user=self.request.user)
+        except:
+            return Response("Error")
+        return Proxy.objects.filter(author=tuser).order_by('id')
+
+    def post(self, request, *args, **kwargs):
+        try:
+            ipconfig = Proxy.objects.get(uuid=request.data['formdata[uuid]'])
+        except:
+            raise Exception
+        ipconfig.ip = request.data['formdata[ip]']
+        ipconfig.is_active = request.data['formdata[is_active]']
+        ipconfig.save()
+        return Response('success')
+
+class ProxyDelView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ProxySerializer
+    queryset = Proxy.objects.filter().order_by('-id')
+    lookup_field = 'uuid'
 
 class HostConfigView(generics.ListCreateAPIView):
     serializer_class = HostConfigSerializer
