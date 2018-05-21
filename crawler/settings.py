@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'crawler.server',
     'rest_framework.authtoken',
     'corsheaders',
+    'django_apscheduler',
 ]
 
 MIDDLEWARE = [

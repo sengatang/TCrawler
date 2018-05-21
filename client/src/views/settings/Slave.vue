@@ -5,29 +5,29 @@
         Slave主机列表
         <el-button icon="el-icon-edit" class="float-right" size="mini" @click="dialogFormVisible = true">新增主机</el-button>
         <el-dialog title="新增主机" :visible.sync="dialogFormVisible">
-          <el-form :model="form" :rules="rules">
+          <el-form :model="slaveForm" :rules="rules">
             <el-form-item label="名称" :label-width="formLabelWidth" prop="name">
-              <el-input v-model="form.name" auto-complete="off"></el-input>
+              <el-input v-model="slaveForm.name" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="IP地址" :label-width="formLabelWidth" prop="ip">
-              <el-input v-model="form.ip" auto-complete="off"></el-input>
+              <el-input v-model="slaveForm.ip" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="端口" :label-width="formLabelWidth" prop="port">
-              <el-input v-model="form.port" auto-complete="off"></el-input>
+              <el-input v-model="slaveForm.port" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="是否需要认证" :label-width="formLabelWidth" prop="auth">
-              <el-switch v-model="form.auth"></el-switch>
+              <el-switch v-model="slaveForm.auth"></el-switch>
             </el-form-item>
-            <el-form-item label="用户名" :label-width="formLabelWidth" v-if="form.auth">
-              <el-input v-model="form.username" :placeholder="请输入用户名"></el-input>
+            <el-form-item label="用户名" :label-width="formLabelWidth" v-if="slaveForm.auth">
+              <el-input v-model="slaveForm.username" :placeholder="请输入用户名"></el-input>
             </el-form-item>
-            <el-form-item label="密码" :label-width="formLabelWidth" v-if="form.auth">
-              <el-input v-model="form.password" type="password"></el-input>
+            <el-form-item label="密码" :label-width="formLabelWidth" v-if="slaveForm.auth">
+              <el-input v-model="slaveForm.password" type="password"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+            <el-button type="primary" @click="addHost">确 定</el-button>
           </div>
         </el-dialog>
       </div>
@@ -39,16 +39,16 @@
           width="55">
         </el-table-column>
         <el-table-column
-          prop="tag"
+          prop="status"
           label="状态"
           width="100"
-          :filters="[{ text: 'error', value: 'error' }, { text: 'success', value: 'success' }]"
+          :filters="[{ text: 'error', value: 0 }, { text: 'success', value: 1 }]"
           :filter-method="filterTag"
           filter-placement="bottom-end">
           <template slot-scope="scope">
             <el-tag
-              :type="scope.row.tag === 'error' ? 'danger' : 'success'"
-              close-transition>{{scope.row.tag}}</el-tag>
+              :type="scope.row.status === 0 ? 'danger' : 1"
+              close-transition>{{scope.row.status}}</el-tag>
           </template>
         </el-table-column>
         <el-table-column
@@ -61,9 +61,8 @@
           width="180">
         </el-table-column>
         <el-table-column
-          prop="address"
-          label="IP"
-          :formatter="formatter">
+          prop="ip"
+          label="IP">
         </el-table-column>
         <el-table-column
           prop="port"
@@ -82,6 +81,29 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-dialog title="修改主机" :visible.sync="dialogFormVisible2">
+        <el-form :model="changeForm" :rules="rules">
+          <el-form-item label="名称" :label-width="formLabelWidth" prop="name">
+            <el-input v-model="changeForm.name" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="IP地址" :label-width="formLabelWidth" prop="ip">
+            <el-input v-model="changeForm.ip" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="端口" :label-width="formLabelWidth" prop="port">
+            <el-input v-model="changeForm.port" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="用户名" :label-width="formLabelWidth">
+            <el-input v-model="changeForm.username" :placeholder="请输入用户名"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" :label-width="formLabelWidth">
+            <el-input v-model="changeForm.password" type="password"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible2 = false">取 消</el-button>
+          <el-button type="primary" @click="changeHost">确 定</el-button>
+        </div>
+      </el-dialog>
     </b-card>
   </div>
   
@@ -165,33 +187,11 @@
   export default {
     data () {
       return {
-        tableData: [{
-          date: '2017-05-22',
-          name: 'test',
-          address: '10.9.27.19',
-          tag: 'success',
-          port: 1080
-        }, {
-          date: '2018-03-14',
-          name: 'main',
-          address: '12.110.120.3',
-          tag: 'error',
-          port: 10
-        }, {
-          date: '2016-05-01',
-          name: 'what',
-          address: '127.0.0.1',
-          tag: 'success',
-          port: 203
-        }, {
-          date: '2017-12-03',
-          name: 'yeah',
-          address: '127.20.0.1',
-          tag: 'error',
-          port: 8000
-        }],
+        tableData: [],
         dialogFormVisible: false,
-        form: {
+        dialogFormVisible2: false,
+        changeForm: {},
+        slaveForm: {
           name: '',
           ip: '',
           port: ''
@@ -210,12 +210,21 @@
         }
       }
     },
+    mounted () {
+      this.fetch()
+    },
     methods: {
+      fetch () {
+        this.$http.get('http://localhost:8000/host/list/').then(response => {
+          console.log(response.body)
+          this.tableData = response.body
+        })
+      },
       formatter (row, column) {
         return row.address
       },
       filterTag (value, row) {
-        return row.tag === value
+        return row.status === value
       },
       filterHandler (value, row, column) {
         const property = column['property']
@@ -227,17 +236,94 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
+          this.$http.delete('http://localhost:8000/host/list/' + this.tableData[index].uuid + '/').then(response => {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            console.log(index, row)
+          }, response => {
+            this.$message({
+              type: 'danger',
+              message: '删除失败'
+            })
           })
-          console.log(index, row)
         }).catch(() => {
           this.$message({
             type: 'info',
             message: '已取消删除'
           })
         })
+        this.fetch()
+        // setTimeout(location.reload(), 5000)
+      },
+      handleEdit (index, row) {
+        this.dialogFormVisible2 = true
+        // console.log(this.tableData[index])
+        this.changeForm = this.tableData[index]
+      },
+      addHost () {
+        this.dialogFormVisible = false
+        if (this.slaveForm.auth) { // 带验证的主机
+          this.$http.post('http://localhost:8000/host/list/', {
+            name: this.slaveForm.name,
+            ip: this.slaveForm.ip,
+            port: this.slaveForm.port,
+            username: this.slaveForm.username,
+            password: this.slaveForm.password
+          }).then(response => {
+            this.$message({
+              type: 'success',
+              message: '成功添加'
+            })
+            // # // setTimeout(location.reload(), 5000)
+          }, response => {
+            this.$message({
+              type: 'danger',
+              message: '添加失败'
+            })
+          })
+        } else {
+          this.$http.post('http://localhost:8000/host/list/', {
+            name: this.slaveForm.name,
+            ip: this.slaveForm.ip,
+            port: this.slaveForm.port
+          }).then(response => {
+            this.$message({
+              type: 'success',
+              message: '成功添加'
+            })
+          }, response => {
+            this.$message({
+              type: 'danger',
+              message: '添加失败'
+            })
+          })
+        }
+        this.fetch()
+        // setTimeout(location.reload(), 5000)
+      },
+      changeHost () {
+        this.$http.patch('http://localhost:8000/host/list/' + this.changeForm.uuid + '/', {
+          name: this.changeForm.name,
+          ip: this.changeForm.ip,
+          port: this.changeForm.port,
+          username: this.changeForm.username,
+          password: this.changeForm.password
+        }).then(response => {
+          this.dialogFormVisible2 = false
+          this.$message({
+            type: 'success',
+            message: '成功修改'
+          })
+        }, response => {
+          this.$message({
+            type: 'danger',
+            message: '修改失败'
+          })
+        })
+        this.fetch()
+        // setTimeout(location.reload(), 5000)
       }
     }
   }

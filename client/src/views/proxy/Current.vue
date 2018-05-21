@@ -63,7 +63,7 @@
             width="30%"
             :before-close="handleClose">
             <div style="margin: 20px;"></div>
-            <el-form :label-position="top" label-width="80px" :model="IpDetail">
+            <el-form  label-width="80px" :model="IpDetail">
               <el-form-item label="IP">
                 <el-input v-model="IpDetail.ip"></el-input>
               </el-form-item>
@@ -123,7 +123,8 @@
               type: 'active',
               message: '删除成功!'
             })
-            location.reload()
+            this.fetch()
+            // setTimeout(location.reload(), 5000)
           }, response => {
             this.$message({
               type: 'danger',
@@ -150,7 +151,8 @@
               type: 'success',
               message: '成功添加'
             })
-            location.reload()
+            this.fetch()
+            // setTimeout(location.reload(), 5000)
           }, response => {
             this.$message({
               type: 'danger',
@@ -178,21 +180,24 @@
             message: '更新成功'
           })
           this.dialogVisible = false
-          location.reload()
+          this.fetch()
+          // setTimeout(location.reload(), 5000)
         }, response => {
           this.$message({
             type: 'danger',
             message: '更新失败'
           })
         })
+      },
+      fetch () {
+        this.$http.get('http://localhost:8000/proxy/list/').then(response => {
+          // console.log(response.body)
+          this.tableData = response.body
+        })
       }
     },
     mounted () {
-      console.log(window.localStorage.token)
-      this.$http.get('http://localhost:8000/proxy/list/').then(response => {
-        console.log(response.body)
-        this.tableData = response.body
-      })
+      this.fetch()
     }
   }
 </script>

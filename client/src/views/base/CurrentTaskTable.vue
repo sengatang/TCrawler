@@ -6,29 +6,31 @@
       <template slot-scope="props">
         <el-form label-position="left" inline class="demo-table-expand">
           <el-form-item label="任务名称">
-            <span>{{ props.row.name }}</span>
+            <span>{{ props.row.tag }}</span>
           </el-form-item>
           <el-form-item label="任务发起人">
-            <span>{{ props.row.shop }}</span>
+            <span>{{ props.row.author }}</span>
           </el-form-item>
-          <el-form-item label="任务编号">
-            <span>{{ props.row.id }}</span>
-          </el-form-item>
+            <el-form-item label="任务编号"
+              type="index"
+              width="50">
+              <sapn>{{props.row.index}}</sapn>
+            </el-form-item>
           <el-form-item label="爬取url">
-            <span>{{ props.row.shopId }}</span>
+            <span>{{ props.row.target_url}}</span>
           </el-form-item>
-          <el-form-item label="系统配置">
+          <!-- <el-form-item label="系统配置">
             <template slot-scope="scope">
                 <el-button
                     size="mini"
                     @click="handleEdit(scope.$index, scope.row)">导出配置文件</el-button>
             </template>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="存储地址">
-            <span>{{ props.row.address }}</span>
+            <span>{{ props.row.result }}</span>
           </el-form-item>
-          <el-form-item label="持续时间">
-            <span>{{ props.row.desc }}</span>
+          <el-form-item label="爬取状态">
+            <span>{{ props.row.status }}</span>
           </el-form-item>
         </el-form>
       </template>
@@ -39,11 +41,11 @@
     </el-table-column>
     <el-table-column
       label="任务名称"
-      prop="name">
+      prop="tag">
     </el-table-column>
     <el-table-column
       label="任务持续时间"
-      prop="desc">
+      prop="last_time">
       <el-progress :percentage="20" ></el-progress>
     </el-table-column>
     <el-table-column
@@ -81,45 +83,16 @@
   export default {
     data () {
       return {
-        tableData5: [{
-          id: '12987122',
-          name: '爬取新闻门户网站',
-          category: '江浙小吃、小吃零食',
-          desc: '2017/12/12 - 2018/03/05',
-          address: '/var/tmp/xinwen',
-          shop: '王小虎夫妻店',
-          shopId: 'wwww.baiduxinwen.com',
-          item: { value: 43, period: 'Jun 11, 2015 - Jul 10, 2015' }
-        }, {
-          id: '12987122',
-          name: '爬取新闻门户网站',
-          category: '江浙小吃、小吃零食',
-          desc: '2017/12/12 - 2018/03/05',
-          address: '/var/tmp/xinwen',
-          shop: '王小虎夫妻店',
-          shopId: 'wwww.baiduxinwen.com',
-          usage: { value: 43, period: 'Jun 11, 2015 - Jul 10, 2015' }
-        }, {
-          id: '12987122',
-          name: '新闻门户网站',
-          category: '江浙小吃、小吃零食',
-          desc: '2017/12/12 - 2018/03/05',
-          address: '/var/tmp/xinwen',
-          shop: '王小虎夫妻店',
-          shopId: 'wwww.baiduxinwen.com',
-          usage: { value: 43, period: 'Jun 11, 2015 - Jul 10, 2015' }
-        }, {
-          id: '12987122',
-          name: '爬取新闻门户网站',
-          category: '江浙小吃、小吃零食',
-          desc: '2017/12/12 - 2018/03/05',
-          address: '/var/tmp/xinwen',
-          shop: '王小虎夫妻店',
-          shopId: 'wwww.baiduxinwen.com',
-          usage: { value: 43, period: 'Jun 11, 2015 - Jul 10, 2015' }
-        }]
+        tableData5: []
       }
     }
+    // ,
+    // methods: {
+
+    // },
+    // mounted: {
+
+    // }
 }
 </script>
 

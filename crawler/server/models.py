@@ -3,6 +3,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.conf import settings
+from django.core.validators import validate_comma_separated_integer_list
 from rest_framework.authtoken.models import Token
 import uuid
 
@@ -40,6 +41,8 @@ class Proxy(models.Model):
 class DBconfig(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    dbtype = models.CharField(max_length=1000, null=True)
+    name = models.CharField(max_length=1000, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey('TcrawlerUser', null=True, on_delete=models.SET_NULL, related_name='dbconfig_user')
     Institution_id = models.ForeignKey('Institution', null=True, on_delete=models.SET_NULL, related_name='dbconfig_institution')
@@ -73,19 +76,24 @@ class Application(models.Model):
 
 class Job(models.Model):
     id = models.AutoField(primary_key=True)
-    uuid = models.UUIDField()
+    tag = models.TextField(max_length=1000, null=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     start_at = models.DateTimeField()
     end_at = models.DateTimeField()
+    weekday = models.CharField(max_length=1000, null=True)
     excute_time = models.TextField()
     author = models.ForeignKey('TcrawlerUser', null=True, on_delete=models.SET_NULL, related_name='job_user')
     institution = models.ForeignKey('Institution', null=True, on_delete=models.SET_NULL, related_name='job_isntitution')
+    result = models.ForeignKey('DBconfig', null=True, on_delete=models.SET_NULL, related_name='task_dbconfig')
     target_url = models.CharField(max_length=255)
-    result = models.ForeignKey('DBconfig', null=True, on_delete=models.SET_NULL, related_name='job_dbconfig')
-    status = models.IntegerField(default=0)  #0 down | 1 success  | 2 stopped
+    tasks = models.CharField(max_length=1000, validators=[validate_comma_separated_integer_list], null=True) # task list
+    # spider_files = models.FileField()
+    status = models.IntegerField(default=0)  #0 down | 1-999 ongoing  | -1 stopped | 999 finished
 
 class Task(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField()
     job = models.ForeignKey('Job', null=True, on_delete=models.SET_NULL, related_name='task_job')
+    # result = models.ForeignKey('DBconfig', null=True, on_delete=models.SET_NULL, related_name='task_dbconfig')
     excute_time = models.TimeField(auto_now_add=True)
 

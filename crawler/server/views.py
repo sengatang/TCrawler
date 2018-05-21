@@ -113,7 +113,10 @@ class ProxyDelView(generics.RetrieveUpdateDestroyAPIView):
 class HostConfigView(generics.ListCreateAPIView):
     serializer_class = HostConfigSerializer
     def get_queryset(self):
-        tuser = TcrawlerUser.objects.get(user=self.request.user)
+        try:
+            tuser = TcrawlerUser.objects.get(user=self.request.user)
+        except:
+            raise ModuleNotFoundError
         return HostConfig.objects.filter(author=tuser).order_by('id')
 
     def create(self, request, *args, **kwargs):
@@ -126,3 +129,71 @@ class HostConfigView(generics.ListCreateAPIView):
         response = serializer.data
         headers = self.get_success_headers(response)
         return Response(response, status=status.HTTP_201_CREATED, headers=headers)
+
+class HostConfigChangeView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = HostConfigSerializer
+    queryset = HostConfig.objects.filter().order_by('-id')
+    lookup_field = 'uuid'
+
+class JobListView(generics.ListCreateAPIView):
+    serializer_class = JobDetailSerializer
+    def get_queryset(self):
+        try:
+            tuser = TcrawlerUser.objects.get(user=self.request.user)
+        except:
+            raise ModuleNotFoundError
+        return Job.objects.filter(author=tuser).order_by('id')
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        tuser = TcrawlerUser.objects.get(user=self.request.user)
+        instance = serializer.save(
+           author=tuser,
+           status = 0
+        )
+        response = serializer.data
+        headers = self.get_success_headers(response)
+        return Response(response, status=status.HTTP_201_CREATED, headers=headers) 
+
+class JobListUpdateDesteroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = JobDetailSerializer
+    queryset = Job.objects.filter().order_by('-id')
+    lookup_field = 'uuid'
+
+class CurrentDBconfigView(generics.ListAPIView):
+    serializer_class = DBconfigSerializer
+    def get_queryset(self):
+        try:
+            tuser = TcrawlerUser.objects.get(user=self.request.user)
+        except:
+            raise ModuleNotFoundError
+        return DBconfig.objects.filter(author=tuser,status=1).order_by('id')
+
+class DBconfigView(generics.ListCreateAPIView):
+    serializer_class = DBconfigSerializer
+    def get_queryset(self):
+        try:
+            tuser = TcrawlerUser.objects.get(user=self.request.user)
+        except:
+            raise ModuleNotFoundError
+        return DBconfig.objects.filter(author=tuser).exclude(status=1).order_by('id')  #TODO: django notqeual
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        tuser = TcrawlerUser.objects.get(user=self.request.user)
+        instance = serializer.save(
+           author=tuser,
+           status = 0
+        )
+        response = serializer.data
+        headers = self.get_success_headers(response)
+        return Response(response, status=status.HTTP_201_CREATED, headers=headers)  
+
+class DBconfigUpdateDestoryView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = DBconfigSerializer
+    queryset = DBconfig.objects.filter().order_by('-id')
+    lookup_field = 'uuid'
+
+

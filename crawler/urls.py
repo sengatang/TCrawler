@@ -34,5 +34,10 @@ urlpatterns = [
     url(r'^proxy/detail/(?P<uuid>[A-Fa-f0-9-]+)/$', ProxyDelView.as_view(), name='del_proxy'),
     url(r'^proxy/list/$', ProxyView.as_view(), name='proxy_list'),
     url(r'^host/list/$', HostConfigView.as_view(), name='host_list'),
-
+    url(r'^host/list/(?P<uuid>[A-Fa-f0-9-]+)/$', HostConfigChangeView.as_view(), name='host_change'),
+    url(r'^dbconfig/current/$', CurrentDBconfigView.as_view(), name='current_dbconfig'),
+    url(r'^dbconfig/list/$', DBconfigView.as_view(), name='dbcofig_list'),
+    url(r'^dbconfig/list/(?P<uuid>[A-Fa-f0-9-]+)/$', DBconfigUpdateDestoryView.as_view(), name='dbconfig_change'),
+    url(r'^job/list/$', JobListView.as_view(), name='job_list'),
+    url(r'^job/list/(?P<uuid>[A-Fa-f0-9-]+)/$', JobListUpdateDesteroyView.as_view(), name='job_change'),
 ]
